@@ -5,7 +5,10 @@
       "Bash(tree:*)",
       "Skill(frontend-design)",
       "Bash(flutter --version:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter format:*)",
+      "Bash(dart format:*)"
     ],
     "deny": [],
     "ask": []
