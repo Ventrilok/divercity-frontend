@@ -9,7 +9,7 @@ class ThemeLoader {
     try {
       final themeStr = await rootBundle.loadString('assets/divercity_theme.json');
       final themeJson = jsonDecode(themeStr);
-      final theme = ThemeDecoder.decodeThemeData(themeJson);
+      final theme = ThemeDecoder().decodeThemeData(themeJson, validate: true);
 
       if (theme == null) {
         throw Exception('Failed to decode theme from JSON');

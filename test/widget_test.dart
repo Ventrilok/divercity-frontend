@@ -11,20 +11,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:divercity_fontend/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('App loads with splash screen', (WidgetTester tester) async {
+    // Create basic theme data for testing
+    final lightTheme = ThemeData.light();
+    final darkTheme = ThemeData.dark();
+
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(MyApp(theme: lightTheme, darkTheme: darkTheme));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that the splash screen is displayed
+    expect(find.text('DiverCity'), findsOneWidget);
+    expect(find.text('Your Dive Companion'), findsOneWidget);
+    expect(find.byIcon(Icons.scuba_diving), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 }

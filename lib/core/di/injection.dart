@@ -26,8 +26,7 @@ class DependencyInjection {
       await Hive.openBox(StorageKeys.syncQueueBox);
       AppLogger.info('Hive boxes opened');
 
-      // Initialize secure storage (no init needed, just instantiate)
-      const secureStorage = FlutterSecureStorage();
+      // Initialize secure storage (no init needed for FlutterSecureStorage)
       AppLogger.info('Secure storage ready');
 
       AppLogger.info('Dependencies initialized successfully');
