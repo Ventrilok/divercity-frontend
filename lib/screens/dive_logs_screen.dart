@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../widgets/ocean_background.dart';
 import '../widgets/dive_card.dart';
 import '../widgets/custom_app_bar.dart';
+import '../widgets/animated_list_item.dart';
 import '../providers/dive_log_provider.dart';
 
 /// Dive logs list screen - displays all dive logs with search/filter
@@ -176,9 +177,12 @@ class _DiveLogsScreenState extends ConsumerState<DiveLogsScreen> {
                           itemCount: filteredDives.length,
                           itemBuilder: (context, index) {
                             final dive = filteredDives[index];
-                            return DiveCard(
-                              dive: dive,
-                              onTap: () => context.go('/dive-logs/${dive.id}'),
+                            return AnimatedListItem(
+                              index: index,
+                              child: DiveCard(
+                                dive: dive,
+                                onTap: () => context.go('/dive-logs/${dive.id}'),
+                              ),
                             );
                           },
                         ),

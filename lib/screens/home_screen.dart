@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../widgets/ocean_background.dart';
 import '../widgets/dive_card.dart';
 import '../widgets/custom_app_bar.dart';
+import '../widgets/animated_list_item.dart';
 import '../providers/dive_log_provider.dart';
 import '../providers/diver_provider.dart';
 import '../providers/emergency_contacts_provider.dart';
@@ -159,11 +160,18 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   )
                 else
-                  ...recentDives.map(
-                    (dive) => DiveCard(
-                      dive: dive,
-                      onTap: () => context.go('/dive-logs/${dive.id}'),
-                    ),
+                  ...recentDives.asMap().entries.map(
+                    (entry) {
+                      final index = entry.key;
+                      final dive = entry.value;
+                      return AnimatedListItem(
+                        index: index,
+                        child: DiveCard(
+                          dive: dive,
+                          onTap: () => context.go('/dive-logs/${dive.id}'),
+                        ),
+                      );
+                    },
                   ),
               ],
             ),

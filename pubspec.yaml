@@ -64,6 +64,7 @@ dependencies:
   flutter_svg: ^2.0.9
   cached_network_image: ^3.3.0
   image_picker: ^1.0.5
+  google_fonts: ^6.1.0
 
   # Utilities
   uuid: ^4.2.2

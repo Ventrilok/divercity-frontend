@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:json_theme/json_theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 
 class ThemeLoader {
@@ -27,13 +28,50 @@ class ThemeLoader {
 
   /// Customize the loaded theme with additional properties
   static ThemeData customizeTheme(ThemeData baseTheme) {
+    // Ocean-inspired distinctive fonts
+    // Montserrat: Modern, clean, and professional for headings
+    // Poppins: Friendly and readable for body text
+    final textTheme = GoogleFonts.poppinsTextTheme(baseTheme.textTheme).copyWith(
+      displayLarge: GoogleFonts.montserrat(
+        textStyle: baseTheme.textTheme.displayLarge,
+        fontWeight: FontWeight.bold,
+      ),
+      displayMedium: GoogleFonts.montserrat(
+        textStyle: baseTheme.textTheme.displayMedium,
+        fontWeight: FontWeight.bold,
+      ),
+      displaySmall: GoogleFonts.montserrat(
+        textStyle: baseTheme.textTheme.displaySmall,
+        fontWeight: FontWeight.bold,
+      ),
+      headlineLarge: GoogleFonts.montserrat(
+        textStyle: baseTheme.textTheme.headlineLarge,
+        fontWeight: FontWeight.bold,
+      ),
+      headlineMedium: GoogleFonts.montserrat(
+        textStyle: baseTheme.textTheme.headlineMedium,
+        fontWeight: FontWeight.w600,
+      ),
+      headlineSmall: GoogleFonts.montserrat(
+        textStyle: baseTheme.textTheme.headlineSmall,
+        fontWeight: FontWeight.w600,
+      ),
+      titleLarge: GoogleFonts.montserrat(
+        textStyle: baseTheme.textTheme.titleLarge,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+
     return baseTheme.copyWith(
-      // Add custom fonts here when selected
-      // Add custom ocean-inspired animations/transitions
+      textTheme: textTheme,
+      // Smooth page transitions
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
         },
       ),
     );
@@ -43,7 +81,7 @@ class ThemeLoader {
   static ThemeData createDarkTheme(ThemeData lightTheme) {
     // For now, return a basic dark theme
     // TODO: Load from assets/divercity_theme_dark.json
-    return ThemeData(
+    final baseDark = ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: ColorScheme.fromSeed(
@@ -51,5 +89,8 @@ class ThemeLoader {
         brightness: Brightness.dark,
       ),
     );
+
+    // Apply the same custom fonts to dark theme
+    return customizeTheme(baseDark);
   }
 }
