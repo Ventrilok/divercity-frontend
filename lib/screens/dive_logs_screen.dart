@@ -6,7 +6,7 @@ import '../widgets/dive_card.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/animated_list_item.dart';
 import '../widgets/animated_fab.dart';
-import '../providers/dive_log_provider.dart';
+import '../features/dive_logs/presentation/providers/dive_log_provider.dart';
 
 /// Dive logs list screen - displays all dive logs with search/filter
 class DiveLogsScreen extends ConsumerStatefulWidget {

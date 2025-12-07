@@ -6,9 +6,9 @@ import '../widgets/dive_card.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/animated_list_item.dart';
 import '../widgets/animated_fab.dart';
-import '../providers/dive_log_provider.dart';
-import '../providers/diver_provider.dart';
-import '../providers/emergency_contacts_provider.dart';
+import '../features/dive_logs/presentation/providers/dive_log_provider.dart';
+import '../features/diver_profile/presentation/providers/diver_provider.dart';
+import '../features/emergency_contacts/presentation/providers/emergency_contacts_provider.dart';
 
 /// Home screen - Main dashboard with stats and navigation
 class HomeScreen extends ConsumerWidget {

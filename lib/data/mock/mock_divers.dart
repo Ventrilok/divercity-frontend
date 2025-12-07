@@ -1,4 +1,4 @@
-import '../../models/diver.dart';
+import '../../features/diver_profile/data/models/diver.dart';
 
 /// Mock diver data for prototype
 class MockDivers {

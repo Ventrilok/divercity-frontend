@@ -7,8 +7,8 @@ import 'package:uuid/uuid.dart';
 import '../widgets/ocean_background.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_button.dart';
-import '../providers/dive_log_provider.dart';
-import '../models/dive_log.dart';
+import '../features/dive_logs/presentation/providers/dive_log_provider.dart';
+import '../features/dive_logs/data/models/dive_log.dart';
 
 /// Add/Edit dive screen - form for creating or editing dive logs
 class AddDiveScreen extends ConsumerStatefulWidget {

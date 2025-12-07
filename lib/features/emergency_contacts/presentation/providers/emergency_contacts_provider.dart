@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/emergency_contact.dart';
-import '../data/mock/mock_emergency_contacts.dart';
+import '../../data/models/emergency_contact.dart';
+import '../../../../data/mock/mock_emergency_contacts.dart';
 
 const String _contactsKey = 'emergency_contacts';
 

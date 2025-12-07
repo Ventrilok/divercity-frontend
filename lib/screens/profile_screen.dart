@@ -4,9 +4,9 @@ import 'package:intl/intl.dart';
 import '../widgets/ocean_background.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/simple_bar_chart.dart';
-import '../models/dive_log.dart';
-import '../providers/diver_provider.dart';
-import '../providers/dive_log_provider.dart';
+import '../features/dive_logs/data/models/dive_log.dart';
+import '../features/diver_profile/presentation/providers/diver_provider.dart';
+import '../features/dive_logs/presentation/providers/dive_log_provider.dart';
 
 /// Profile screen - displays user information and dive statistics
 class ProfileScreen extends ConsumerWidget {

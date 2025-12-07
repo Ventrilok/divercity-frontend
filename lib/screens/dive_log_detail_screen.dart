@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../widgets/ocean_background.dart';
 import '../widgets/custom_app_bar.dart';
-import '../providers/dive_log_provider.dart';
+import '../features/dive_logs/presentation/providers/dive_log_provider.dart';
 
 /// Dive log detail screen - displays full dive information
 class DiveLogDetailScreen extends ConsumerWidget {

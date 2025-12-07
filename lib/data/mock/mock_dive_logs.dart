@@ -1,4 +1,4 @@
-import '../../models/dive_log.dart';
+import '../../features/dive_logs/data/models/dive_log.dart';
 
 /// Mock dive log data for prototype
 class MockDiveLogs {

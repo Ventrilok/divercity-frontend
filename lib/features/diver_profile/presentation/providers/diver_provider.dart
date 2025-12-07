@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/diver.dart';
-import '../data/mock/mock_divers.dart';
+import '../../data/models/diver.dart';
+import '../../../../data/mock/mock_divers.dart';
 
 /// Notifier for managing diver profile (Riverpod 3.x)
 class DiverNotifier extends Notifier<Diver> {
