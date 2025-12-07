@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'core/theme/theme_loader.dart';
 import 'core/di/injection.dart';
 import 'core/utils/logger.dart';
-import 'features/auth/presentation/pages/splash_page.dart';
+import 'core/routing/app_router.dart';
 
 void main() async {
   // Ensure Flutter is initialized
@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'DiverCity',
 
       // Theme
@@ -89,8 +89,8 @@ class MyApp extends StatelessWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
 
-      // Routing (will be replaced with GoRouter in Phase 7)
-      home: const SplashPage(),
+      // Routing with GoRouter
+      routerConfig: appRouter,
 
       // Debug
       debugShowCheckedModeBanner: false,
