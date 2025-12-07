@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../widgets/ocean_background.dart';
 import '../widgets/custom_app_bar.dart';
+import '../widgets/animated_fab.dart';
 import '../providers/emergency_contacts_provider.dart';
 import '../models/emergency_contact.dart';
 
@@ -60,11 +61,10 @@ class EmergencyContactsScreen extends ConsumerWidget {
                 ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: AnimatedOceanFAB(
         onPressed: () => _showAddDialog(context, ref),
-        icon: const Icon(Icons.add),
-        label: const Text('Add Contact'),
-        backgroundColor: const Color(0xFF00A8E8),
+        icon: Icons.add,
+        label: 'Add Contact',
       ),
     );
   }

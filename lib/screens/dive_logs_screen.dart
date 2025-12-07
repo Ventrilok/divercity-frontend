@@ -5,6 +5,7 @@ import '../widgets/ocean_background.dart';
 import '../widgets/dive_card.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/animated_list_item.dart';
+import '../widgets/animated_fab.dart';
 import '../providers/dive_log_provider.dart';
 
 /// Dive logs list screen - displays all dive logs with search/filter
@@ -192,11 +193,10 @@ class _DiveLogsScreenState extends ConsumerState<DiveLogsScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: AnimatedOceanFAB(
         onPressed: () => context.go('/dive-logs/add'),
-        icon: const Icon(Icons.add),
-        label: const Text('Add Dive'),
-        backgroundColor: const Color(0xFF00A8E8),
+        icon: Icons.add,
+        label: 'Add Dive',
       ),
     );
   }

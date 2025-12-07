@@ -31,6 +31,16 @@ class DiveLogDetailScreen extends ConsumerWidget {
         title: 'Dive Details',
         actions: [
           IconButton(
+            icon: Icon(
+              dive.isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: dive.isFavorite ? Colors.red : null,
+            ),
+            onPressed: () {
+              ref.read(diveLogProvider.notifier).toggleFavorite(diveLogId);
+            },
+            tooltip: dive.isFavorite ? 'Remove from favorites' : 'Add to favorites',
+          ),
+          IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () => context.go('/dive-logs/$diveLogId/edit'),
             tooltip: 'Edit dive',

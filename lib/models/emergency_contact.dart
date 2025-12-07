@@ -49,6 +49,32 @@ class EmergencyContact {
     );
   }
 
+  /// Convert to JSON for persistence
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'relationship': relationship,
+      'phone': phone,
+      'email': email,
+      'address': address,
+      'notes': notes,
+    };
+  }
+
+  /// Create from JSON
+  factory EmergencyContact.fromJson(Map<String, dynamic> json) {
+    return EmergencyContact(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      relationship: json['relationship'] as String,
+      phone: json['phone'] as String,
+      email: json['email'] as String?,
+      address: json['address'] as String?,
+      notes: json['notes'] as String?,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

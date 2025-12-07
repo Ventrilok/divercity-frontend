@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../widgets/ocean_background.dart';
 import '../widgets/custom_app_bar.dart';
+import '../widgets/simple_bar_chart.dart';
+import '../models/dive_log.dart';
 import '../providers/diver_provider.dart';
 import '../providers/dive_log_provider.dart';
 
@@ -236,6 +238,20 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
+                // Monthly Dive Chart
+                if (allDives.isNotEmpty) ...[
+                  Text(
+                    'Monthly Activity',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMonthlyDiveChart(allDives),
+                  const SizedBox(height: 24),
+                ],
+
                 // Settings Section
                 Text(
                   'Settings',
@@ -320,6 +336,35 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  /// Build monthly dive activity chart
+  Widget _buildMonthlyDiveChart(List<DiveLog> dives) {
+    // Get last 6 months
+    final now = DateTime.now();
+    final monthlyData = <ChartData>[];
+
+    for (int i = 5; i >= 0; i--) {
+      final month = DateTime(now.year, now.month - i, 1);
+      final monthName = DateFormat('MMM').format(month);
+
+      final count = dives.where((dive) {
+        return dive.diveDate.year == month.year &&
+            dive.diveDate.month == month.month;
+      }).length;
+
+      monthlyData.add(ChartData(
+        label: monthName,
+        value: count.toDouble(),
+        color: const Color(0xFF00A8E8),
+      ));
+    }
+
+    return SimpleBarChart(
+      title: 'Dives per Month (Last 6 Months)',
+      data: monthlyData,
+      height: 180,
     );
   }
 }

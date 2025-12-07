@@ -13,6 +13,7 @@ class DiveLog {
   final double? exitPressure;
   final String? gasMix;
   final String? notes;
+  final bool isFavorite;
 
   DiveLog({
     required this.id,
@@ -27,6 +28,7 @@ class DiveLog {
     this.exitPressure,
     this.gasMix,
     this.notes,
+    this.isFavorite = false,
   });
 
   /// Format depth with unit
@@ -72,6 +74,7 @@ class DiveLog {
     double? exitPressure,
     String? gasMix,
     String? notes,
+    bool? isFavorite,
   }) {
     return DiveLog(
       id: id ?? this.id,
@@ -86,6 +89,53 @@ class DiveLog {
       exitPressure: exitPressure ?? this.exitPressure,
       gasMix: gasMix ?? this.gasMix,
       notes: notes ?? this.notes,
+      isFavorite: isFavorite ?? this.isFavorite,
+    );
+  }
+
+  /// Convert to JSON for persistence
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'diveSite': diveSite,
+      'location': location,
+      'diveDate': diveDate.toIso8601String(),
+      'maxDepth': maxDepth,
+      'duration': duration,
+      'waterTemperature': waterTemperature,
+      'airTemperature': airTemperature,
+      'entryPressure': entryPressure,
+      'exitPressure': exitPressure,
+      'gasMix': gasMix,
+      'notes': notes,
+      'isFavorite': isFavorite,
+    };
+  }
+
+  /// Create from JSON
+  factory DiveLog.fromJson(Map<String, dynamic> json) {
+    return DiveLog(
+      id: json['id'] as String,
+      diveSite: json['diveSite'] as String,
+      location: json['location'] as String,
+      diveDate: DateTime.parse(json['diveDate'] as String),
+      maxDepth: (json['maxDepth'] as num).toDouble(),
+      duration: json['duration'] as int,
+      waterTemperature: json['waterTemperature'] != null
+          ? (json['waterTemperature'] as num).toDouble()
+          : null,
+      airTemperature: json['airTemperature'] != null
+          ? (json['airTemperature'] as num).toDouble()
+          : null,
+      entryPressure: json['entryPressure'] != null
+          ? (json['entryPressure'] as num).toDouble()
+          : null,
+      exitPressure: json['exitPressure'] != null
+          ? (json['exitPressure'] as num).toDouble()
+          : null,
+      gasMix: json['gasMix'] as String?,
+      notes: json['notes'] as String?,
+      isFavorite: json['isFavorite'] as bool? ?? false,
     );
   }
 
