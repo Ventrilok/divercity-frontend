@@ -10,6 +10,8 @@ import '../../features/diver_profile/data/datasources/diver_local_datasource.dar
 import '../../features/diver_profile/data/datasources/diver_remote_datasource.dart';
 import '../../features/diver_profile/data/repositories/diver_repository_impl.dart';
 import '../../features/diver_profile/domain/repositories/diver_repository.dart';
+import '../../features/diver_profile/domain/usecases/get_diver_profile.dart';
+import '../../features/diver_profile/domain/usecases/update_diver_profile.dart';
 
 // ============================================================================
 // Core Providers
@@ -56,6 +58,16 @@ final diverRepositoryProvider = Provider<DiverRepository>((ref) {
     localDataSource: ref.read(diverLocalDataSourceProvider),
     networkInfo: ref.read(networkInfoProvider),
   );
+});
+
+/// Get diver profile use case provider
+final getDiverProfileProvider = Provider((ref) {
+  return GetDiverProfile(ref.read(diverRepositoryProvider));
+});
+
+/// Update diver profile use case provider
+final updateDiverProfileProvider = Provider((ref) {
+  return UpdateDiverProfile(ref.read(diverRepositoryProvider));
 });
 
 // ============================================================================
