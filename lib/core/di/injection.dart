@@ -6,6 +6,10 @@ import '../constants/storage_keys.dart';
 import '../network/dio_client.dart';
 import '../network/network_info.dart';
 import '../utils/logger.dart';
+import '../../features/diver_profile/data/datasources/diver_local_datasource.dart';
+import '../../features/diver_profile/data/datasources/diver_remote_datasource.dart';
+import '../../features/diver_profile/data/repositories/diver_repository_impl.dart';
+import '../../features/diver_profile/domain/repositories/diver_repository.dart';
 
 // ============================================================================
 // Core Providers
@@ -29,6 +33,29 @@ final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
 /// Dio client provider - for making HTTP requests
 final dioClientProvider = Provider<DioClient>((ref) {
   return DioClient(secureStorage: ref.read(secureStorageProvider));
+});
+
+// ============================================================================
+// Feature: Diver Profile
+// ============================================================================
+
+/// Diver remote datasource provider
+final diverRemoteDataSourceProvider = Provider<DiverRemoteDataSource>((ref) {
+  return DiverRemoteDataSourceImpl(ref.read(dioClientProvider).dio);
+});
+
+/// Diver local datasource provider
+final diverLocalDataSourceProvider = Provider<DiverLocalDataSource>((ref) {
+  return DiverLocalDataSourceImpl();
+});
+
+/// Diver repository provider
+final diverRepositoryProvider = Provider<DiverRepository>((ref) {
+  return DiverRepositoryImpl(
+    remoteDataSource: ref.read(diverRemoteDataSourceProvider),
+    localDataSource: ref.read(diverLocalDataSourceProvider),
+    networkInfo: ref.read(networkInfoProvider),
+  );
 });
 
 // ============================================================================
