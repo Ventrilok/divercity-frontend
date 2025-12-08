@@ -1,4 +1,5 @@
 import '../../../../core/utils/typedef.dart';
+import '../entities/diver.dart';
 import '../repositories/diver_repository.dart';
 
 /// Use case for getting a diver profile

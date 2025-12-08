@@ -16,10 +16,19 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final diver = ref.watch(diverProvider);
+    final diverState = ref.watch(diverProvider);
     final allDives = ref.watch(diveLogProvider);
     final recentDives = ref.watch(recentDivesProvider);
     final emergencyContacts = ref.watch(emergencyContactsProvider);
+
+    // Show loading if diver profile is loading
+    if (diverState.isLoading && diverState.diver == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final diver = diverState.diver;
 
     return Scaffold(
       appBar: const OceanAppBar(
@@ -34,7 +43,7 @@ class HomeScreen extends ConsumerWidget {
               children: [
                 // Welcome section
                 Text(
-                  'Welcome back, ${diver.firstname}!',
+                  'Welcome back, ${diver?.firstname ?? "Diver"}!',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -98,7 +107,7 @@ class HomeScreen extends ConsumerWidget {
                       child: _QuickActionCard(
                         icon: Icons.person,
                         title: 'Profile',
-                        subtitle: diver.fullName,
+                        subtitle: diver?.fullName ?? 'View Profile',
                         onTap: () => context.go('/profile'),
                       ),
                     ),

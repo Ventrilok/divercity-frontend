@@ -14,8 +14,18 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final diver = ref.watch(diverProvider);
+    final diverState = ref.watch(diverProvider);
     final allDives = ref.watch(diveLogProvider);
+
+    // Show loading if diver profile is loading
+    if (diverState.isLoading && diverState.diver == null) {
+      return const Scaffold(
+        appBar: OceanAppBar(title: 'Profile'),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final diver = diverState.diver;
 
     // Calculate statistics
     final totalDives = allDives.length;
@@ -92,7 +102,7 @@ class ProfileScreen extends ConsumerWidget {
 
                         // Name
                         Text(
-                          diver.fullName,
+                          diver?.fullName ?? 'Diver Profile',
                           style:
                               Theme.of(context).textTheme.headlineSmall?.copyWith(
                                     color: Colors.white,
@@ -102,14 +112,14 @@ class ProfileScreen extends ConsumerWidget {
                         const SizedBox(height: 8),
 
                         // Email
-                        if (diver.email != null)
+                        if (diver?.email != null)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(Icons.email, color: Colors.white70, size: 16),
                               const SizedBox(width: 4),
                               Text(
-                                diver.email!,
+                                diver!.email,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium
@@ -122,14 +132,14 @@ class ProfileScreen extends ConsumerWidget {
                         const SizedBox(height: 4),
 
                         // Phone
-                        if (diver.phone != null)
+                        if (diver?.phone != null)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(Icons.phone, color: Colors.white70, size: 16),
                               const SizedBox(width: 4),
                               Text(
-                                diver.phone!,
+                                diver!.phone!,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium
@@ -142,9 +152,9 @@ class ProfileScreen extends ConsumerWidget {
                         const SizedBox(height: 16),
 
                         // Member since
-                        if (diver.joinedAt != null)
+                        if (diver?.joinedAt != null)
                           Text(
-                            'Member since ${dateFormat.format(diver.joinedAt!)}',
+                            'Member since ${dateFormat.format(diver!.joinedAt!)}',
                             style:
                                 Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: Colors.white60,
