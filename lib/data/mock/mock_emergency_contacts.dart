@@ -1,4 +1,4 @@
-import '../../features/emergency_contacts/data/models/emergency_contact.dart';
+import '../../features/emergency_contacts/domain/entities/emergency_contact.dart';
 
 /// Mock emergency contact data for prototype
 class MockEmergencyContacts {

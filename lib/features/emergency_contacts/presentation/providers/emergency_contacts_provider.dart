@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../data/models/emergency_contact.dart';
+import '../../domain/entities/emergency_contact.dart';
+import '../../data/models/emergency_contact_model.dart';
 import '../../../../data/mock/mock_emergency_contacts.dart';
 
 const String _contactsKey = 'emergency_contacts';
@@ -26,7 +27,7 @@ class EmergencyContactsNotifier extends Notifier<List<EmergencyContact>> {
         final List<dynamic> jsonList = json.decode(jsonString);
         final List<EmergencyContact> loadedContacts = jsonList
             .map((json) =>
-                EmergencyContact.fromJson(json as Map<String, dynamic>))
+                EmergencyContactModel.fromJson(json as Map<String, dynamic>).toEntity())
             .toList();
         state = loadedContacts;
       } catch (e) {
@@ -40,7 +41,7 @@ class EmergencyContactsNotifier extends Notifier<List<EmergencyContact>> {
   Future<void> _saveContacts() async {
     _prefs ??= await SharedPreferences.getInstance();
     final List<Map<String, dynamic>> jsonList =
-        state.map((contact) => contact.toJson()).toList();
+        state.map((contact) => EmergencyContactModel.fromEntity(contact).toJson()).toList();
     final String jsonString = json.encode(jsonList);
     await _prefs?.setString(_contactsKey, jsonString);
   }

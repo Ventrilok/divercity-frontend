@@ -5,7 +5,7 @@ import '../widgets/ocean_background.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/animated_fab.dart';
 import '../features/emergency_contacts/presentation/providers/emergency_contacts_provider.dart';
-import '../features/emergency_contacts/data/models/emergency_contact.dart';
+import '../features/emergency_contacts/domain/entities/emergency_contact.dart';
 
 /// Emergency contacts screen - displays and manages emergency contacts
 class EmergencyContactsScreen extends ConsumerWidget {
