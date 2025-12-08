@@ -1,119 +1,177 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/di/injection.dart';
 import '../../domain/entities/emergency_contact.dart';
-import '../../data/models/emergency_contact_model.dart';
-import '../../../../data/mock/mock_emergency_contacts.dart';
+import '../../../diver_profile/presentation/providers/diver_provider.dart';
 
-const String _contactsKey = 'emergency_contacts';
+/// State for emergency contacts with loading and error handling
+class EmergencyContactsState {
+  final List<EmergencyContact> contacts;
+  final bool isLoading;
+  final String? error;
 
-/// Notifier for managing emergency contacts (Riverpod 3.x) with persistence
-class EmergencyContactsNotifier extends Notifier<List<EmergencyContact>> {
-  SharedPreferences? _prefs;
+  EmergencyContactsState({
+    this.contacts = const [],
+    this.isLoading = false,
+    this.error,
+  });
 
+  EmergencyContactsState copyWith({
+    List<EmergencyContact>? contacts,
+    bool? isLoading,
+    String? error,
+  }) {
+    return EmergencyContactsState(
+      contacts: contacts ?? this.contacts,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
+}
+
+/// Notifier for managing emergency contacts with API integration
+class EmergencyContactsNotifier extends Notifier<EmergencyContactsState> {
   @override
-  List<EmergencyContact> build() {
-    _loadContacts();
-    return MockEmergencyContacts.getAllContacts();
+  EmergencyContactsState build() {
+    // Load emergency contacts on initialization
+    loadContacts();
+    return EmergencyContactsState(isLoading: true);
   }
 
-  /// Load contacts from SharedPreferences
-  Future<void> _loadContacts() async {
-    _prefs = await SharedPreferences.getInstance();
-    final String? jsonString = _prefs?.getString(_contactsKey);
+  /// Load emergency contacts from API (or cache if offline)
+  Future<void> loadContacts() async {
+    state = state.copyWith(isLoading: true, error: null);
 
-    if (jsonString != null && jsonString.isNotEmpty) {
-      try {
-        final List<dynamic> jsonList = json.decode(jsonString);
-        final List<EmergencyContact> loadedContacts = jsonList
-            .map((json) =>
-                EmergencyContactModel.fromJson(json as Map<String, dynamic>).toEntity())
-            .toList();
-        state = loadedContacts;
-      } catch (e) {
-        // If there's an error loading, use mock data
-        state = MockEmergencyContacts.getAllContacts();
-      }
-    }
-  }
+    final useCase = ref.read(getEmergencyContactsProvider);
+    final result = await useCase(kMockDiverId);
 
-  /// Save contacts to SharedPreferences
-  Future<void> _saveContacts() async {
-    _prefs ??= await SharedPreferences.getInstance();
-    final List<Map<String, dynamic>> jsonList =
-        state.map((contact) => EmergencyContactModel.fromEntity(contact).toJson()).toList();
-    final String jsonString = json.encode(jsonList);
-    await _prefs?.setString(_contactsKey, jsonString);
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          isLoading: false,
+          error: failure.message,
+        );
+      },
+      (contacts) {
+        state = state.copyWith(
+          contacts: contacts,
+          isLoading: false,
+          error: null,
+        );
+      },
+    );
   }
 
   /// Add a new emergency contact
-  void addContact(EmergencyContact contact) {
-    state = [...state, contact];
-    _saveContacts();
+  Future<void> addContact(EmergencyContact contact) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final useCase = ref.read(createEmergencyContactProvider);
+    final result = await useCase(contact);
+
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          isLoading: false,
+          error: failure.message,
+        );
+      },
+      (createdContact) {
+        state = state.copyWith(
+          contacts: [...state.contacts, createdContact],
+          isLoading: false,
+          error: null,
+        );
+      },
+    );
   }
 
   /// Update an existing contact
-  void updateContact(EmergencyContact updatedContact) {
-    state = [
-      for (final contact in state)
-        if (contact.id == updatedContact.id) updatedContact else contact
-    ];
-    _saveContacts();
+  Future<void> updateContact(EmergencyContact updatedContact) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final useCase = ref.read(updateEmergencyContactProvider);
+    final result = await useCase(updatedContact);
+
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          isLoading: false,
+          error: failure.message,
+        );
+      },
+      (updated) {
+        state = state.copyWith(
+          contacts: [
+            for (final contact in state.contacts)
+              if (contact.id == updated.id) updated else contact
+          ],
+          isLoading: false,
+          error: null,
+        );
+      },
+    );
   }
 
-  /// Delete a contact by ID
-  void deleteContact(String id) {
-    state = state.where((contact) => contact.id != id).toList();
-    _saveContacts();
+  /// Delete an emergency contact by ID
+  Future<void> deleteContact(String id) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final useCase = ref.read(deleteEmergencyContactProvider);
+    final result = await useCase(id);
+
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          isLoading: false,
+          error: failure.message,
+        );
+      },
+      (_) {
+        state = state.copyWith(
+          contacts: state.contacts.where((contact) => contact.id != id).toList(),
+          isLoading: false,
+          error: null,
+        );
+      },
+    );
+  }
+
+  /// Toggle favorite status of an emergency contact
+  Future<void> toggleFavorite(String id) async {
+    final contact = state.contacts.firstWhere((c) => c.id == id);
+    final updatedContact = contact.copyWith(isFavorite: !contact.isFavorite);
+    await updateContact(updatedContact);
   }
 
   /// Get a contact by ID
   EmergencyContact? getContactById(String id) {
     try {
-      return state.firstWhere((contact) => contact.id == id);
+      return state.contacts.firstWhere((contact) => contact.id == id);
     } catch (e) {
       return null;
     }
-  }
-
-  /// Get primary contact (first in list)
-  EmergencyContact? getPrimaryContact() {
-    if (state.isEmpty) return null;
-    return state.first;
-  }
-
-  /// Reorder contacts
-  void reorderContacts(int oldIndex, int newIndex) {
-    final items = List<EmergencyContact>.from(state);
-    if (newIndex > oldIndex) {
-      newIndex -= 1;
-    }
-    final item = items.removeAt(oldIndex);
-    items.insert(newIndex, item);
-    state = items;
-    _saveContacts();
   }
 }
 
 /// Provider for accessing emergency contacts
 final emergencyContactsProvider =
-    NotifierProvider<EmergencyContactsNotifier, List<EmergencyContact>>(
+    NotifierProvider<EmergencyContactsNotifier, EmergencyContactsState>(
   EmergencyContactsNotifier.new,
 );
 
 /// Provider for getting a specific contact by ID
-final contactByIdProvider = Provider.family<EmergencyContact?, String>((ref, id) {
-  final contacts = ref.watch(emergencyContactsProvider);
+final emergencyContactByIdProvider =
+    Provider.family<EmergencyContact?, String>((ref, id) {
+  final state = ref.watch(emergencyContactsProvider);
   try {
-    return contacts.firstWhere((contact) => contact.id == id);
+    return state.contacts.firstWhere((contact) => contact.id == id);
   } catch (e) {
     return null;
   }
 });
 
-/// Provider for getting the primary contact
-final primaryContactProvider = Provider<EmergencyContact?>((ref) {
-  final contacts = ref.watch(emergencyContactsProvider);
-  if (contacts.isEmpty) return null;
-  return contacts.first;
+/// Provider for getting favorite contacts
+final favoriteContactsProvider = Provider<List<EmergencyContact>>((ref) {
+  final state = ref.watch(emergencyContactsProvider);
+  return state.contacts.where((contact) => contact.isFavorite).toList();
 });

@@ -21,6 +21,15 @@ import '../../features/dive_logs/domain/usecases/get_dive_log_by_id.dart';
 import '../../features/dive_logs/domain/usecases/create_dive_log.dart';
 import '../../features/dive_logs/domain/usecases/update_dive_log.dart';
 import '../../features/dive_logs/domain/usecases/delete_dive_log.dart';
+import '../../features/emergency_contacts/data/datasources/emergency_contact_local_datasource.dart';
+import '../../features/emergency_contacts/data/datasources/emergency_contact_remote_datasource.dart';
+import '../../features/emergency_contacts/data/repositories/emergency_contact_repository_impl.dart';
+import '../../features/emergency_contacts/domain/repositories/emergency_contact_repository.dart';
+import '../../features/emergency_contacts/domain/usecases/get_emergency_contacts.dart';
+import '../../features/emergency_contacts/domain/usecases/get_emergency_contact_by_id.dart';
+import '../../features/emergency_contacts/domain/usecases/create_emergency_contact.dart';
+import '../../features/emergency_contacts/domain/usecases/update_emergency_contact.dart';
+import '../../features/emergency_contacts/domain/usecases/delete_emergency_contact.dart';
 
 // ============================================================================
 // Core Providers
@@ -125,6 +134,57 @@ final updateDiveLogProvider = Provider((ref) {
 /// Delete dive log use case provider
 final deleteDiveLogProvider = Provider((ref) {
   return DeleteDiveLog(ref.read(diveLogRepositoryProvider));
+});
+
+// ============================================================================
+// Feature: Emergency Contacts
+// ============================================================================
+
+/// Emergency contact remote datasource provider
+final emergencyContactRemoteDataSourceProvider =
+    Provider<EmergencyContactRemoteDataSource>((ref) {
+  return EmergencyContactRemoteDataSourceImpl(ref.read(dioClientProvider).dio);
+});
+
+/// Emergency contact local datasource provider
+final emergencyContactLocalDataSourceProvider =
+    Provider<EmergencyContactLocalDataSource>((ref) {
+  return EmergencyContactLocalDataSourceImpl();
+});
+
+/// Emergency contact repository provider
+final emergencyContactRepositoryProvider =
+    Provider<EmergencyContactRepository>((ref) {
+  return EmergencyContactRepositoryImpl(
+    remoteDataSource: ref.read(emergencyContactRemoteDataSourceProvider),
+    localDataSource: ref.read(emergencyContactLocalDataSourceProvider),
+    networkInfo: ref.read(networkInfoProvider),
+  );
+});
+
+/// Get emergency contacts use case provider
+final getEmergencyContactsProvider = Provider((ref) {
+  return GetEmergencyContacts(ref.read(emergencyContactRepositoryProvider));
+});
+
+/// Get emergency contact by ID use case provider
+final getEmergencyContactByIdProvider = Provider((ref) {
+  return GetEmergencyContactById(ref.read(emergencyContactRepositoryProvider));
+});
+
+/// Create emergency contact use case provider
+final createEmergencyContactProvider = Provider((ref) {
+  return CreateEmergencyContact(ref.read(emergencyContactRepositoryProvider));
+});
+
+/// Update emergency contact use case provider
+final updateEmergencyContactProvider = Provider((ref) {
+  return UpdateEmergencyContact(ref.read(emergencyContactRepositoryProvider));
+});
+
+/// Delete emergency contact use case provider
+final deleteEmergencyContactProvider = Provider((ref) {
+  return DeleteEmergencyContact(ref.read(emergencyContactRepositoryProvider));
 });
 
 // ============================================================================

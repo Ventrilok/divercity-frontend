@@ -19,7 +19,8 @@ class HomeScreen extends ConsumerWidget {
     final diverState = ref.watch(diverProvider);
     final diveLogState = ref.watch(diveLogProvider);
     final recentDives = ref.watch(recentDivesProvider);
-    final emergencyContacts = ref.watch(emergencyContactsProvider);
+    final contactsState = ref.watch(emergencyContactsProvider);
+    final emergencyContacts = contactsState.contacts;
 
     // Show loading if diver profile is loading
     if (diverState.isLoading && diverState.diver == null) {

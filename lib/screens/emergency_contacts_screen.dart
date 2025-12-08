@@ -13,7 +13,8 @@ class EmergencyContactsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final contacts = ref.watch(emergencyContactsProvider);
+    final contactsState = ref.watch(emergencyContactsProvider);
+    final contacts = contactsState.contacts;
 
     return Scaffold(
       appBar: const OceanAppBar(title: 'Emergency Contacts'),
