@@ -1,7 +1,39 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../constants/storage_keys.dart';
+import '../network/dio_client.dart';
+import '../network/network_info.dart';
 import '../utils/logger.dart';
+
+// ============================================================================
+// Core Providers
+// ============================================================================
+
+/// Connectivity provider - for checking network connectivity
+final connectivityProvider = Provider<Connectivity>((ref) {
+  return Connectivity();
+});
+
+/// Network info provider - for checking if device is connected
+final networkInfoProvider = Provider<NetworkInfo>((ref) {
+  return NetworkInfoImpl(ref.read(connectivityProvider));
+});
+
+/// Secure storage provider - for storing sensitive data (tokens, credentials)
+final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
+  return const FlutterSecureStorage();
+});
+
+/// Dio client provider - for making HTTP requests
+final dioClientProvider = Provider<DioClient>((ref) {
+  return DioClient(secureStorage: ref.read(secureStorageProvider));
+});
+
+// ============================================================================
+// Initialization
+// ============================================================================
 
 class DependencyInjection {
   static Future<void> init() async {
