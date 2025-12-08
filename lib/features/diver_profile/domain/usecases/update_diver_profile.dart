@@ -10,7 +10,7 @@ class UpdateDiverProfile {
   UpdateDiverProfile(this.repository);
 
   /// Execute the use case
-  /// Returns Either<Failure, Diver> with updated diver
+  /// Returns `Either<Failure, Diver>` with updated diver
   ResultFuture<Diver> call(Diver diver) {
     return repository.updateDiverProfile(diver);
   }

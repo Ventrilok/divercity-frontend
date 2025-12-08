@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../data/models/dive_log.dart';
+import '../../domain/entities/dive_log.dart';
+import '../../data/models/dive_log_model.dart';
 import '../../../../data/mock/mock_dive_logs.dart';
 import '../../../diver_profile/presentation/providers/diver_provider.dart';
 
@@ -26,7 +27,7 @@ class DiveLogNotifier extends Notifier<List<DiveLog>> {
       try {
         final List<dynamic> jsonList = json.decode(jsonString);
         final List<DiveLog> loadedLogs = jsonList
-            .map((json) => DiveLog.fromJson(json as Map<String, dynamic>))
+            .map((json) => DiveLogModel.fromJson(json as Map<String, dynamic>).toEntity())
             .toList();
         state = loadedLogs;
       } catch (e) {
@@ -40,7 +41,7 @@ class DiveLogNotifier extends Notifier<List<DiveLog>> {
   Future<void> _saveDiveLogs() async {
     _prefs ??= await SharedPreferences.getInstance();
     final List<Map<String, dynamic>> jsonList =
-        state.map((log) => log.toJson()).toList();
+        state.map((log) => DiveLogModel.fromEntity(log).toJson()).toList();
     final String jsonString = json.encode(jsonList);
     await _prefs?.setString(_diveLogsKey, jsonString);
   }

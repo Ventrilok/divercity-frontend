@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../features/dive_logs/data/models/dive_log.dart';
+import '../features/dive_logs/domain/entities/dive_log.dart';
 
 /// Card widget to display a dive log summary
 /// Designed with ocean-inspired styling
