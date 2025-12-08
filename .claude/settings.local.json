@@ -11,7 +11,10 @@
       "Bash(dart format:*)",
       "Bash(flutter analyze:*)",
       "Bash(git mv:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(flutter pub run build_runner build:*)",
+      "Bash(dart analyze:*)"
     ],
     "deny": [],
     "ask": []

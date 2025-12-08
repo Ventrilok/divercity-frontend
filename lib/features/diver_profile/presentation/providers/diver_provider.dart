@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/models/diver.dart';
+import '../../domain/entities/diver.dart';
 import '../../../../data/mock/mock_divers.dart';
 
 /// Notifier for managing diver profile (Riverpod 3.x)
@@ -29,10 +29,10 @@ class DiverNotifier extends Notifier<Diver> {
     String? addressCountry,
   }) {
     state = state.copyWith(
-      firstname: firstname,
-      lastname: lastname,
-      email: email,
-      phone: phone,
+      firstname: firstname ?? state.firstname,
+      lastname: lastname ?? state.lastname,
+      email: email ?? state.email,
+      phone: phone ?? state.phone,
       bloodType: bloodType,
       birthdate: birthdate,
       addressStreet: addressStreet,
