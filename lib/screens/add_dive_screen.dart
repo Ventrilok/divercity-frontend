@@ -60,8 +60,8 @@ class _AddDiveScreenState extends ConsumerState<AddDiveScreen> {
   }
 
   void _loadExistingDive() {
-    final allDives = ref.read(diveLogProvider);
-    final dive = allDives.firstWhere((d) => d.id == widget.diveLogId);
+    final diveLogState = ref.read(diveLogProvider);
+    final dive = diveLogState.diveLogs.firstWhere((d) => d.id == widget.diveLogId);
 
     _diveSiteController.text = dive.diveSite;
     _locationController.text = dive.location;
@@ -358,8 +358,8 @@ class _AddDiveScreenState extends ConsumerState<AddDiveScreen> {
 
       if (isEditMode) {
         // Update existing dive
-        final allDives = ref.read(diveLogProvider);
-        final existingDive = allDives.firstWhere((d) => d.id == widget.diveLogId);
+        final diveLogState = ref.read(diveLogProvider);
+        final existingDive = diveLogState.diveLogs.firstWhere((d) => d.id == widget.diveLogId);
 
         final updatedDive = existingDive.copyWith(
           diveSite: _diveSiteController.text.trim(),

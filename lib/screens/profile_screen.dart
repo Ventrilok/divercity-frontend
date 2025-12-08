@@ -15,7 +15,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final diverState = ref.watch(diverProvider);
-    final allDives = ref.watch(diveLogProvider);
+    final diveLogState = ref.watch(diveLogProvider);
 
     // Show loading if diver profile is loading
     if (diverState.isLoading && diverState.diver == null) {
@@ -26,6 +26,7 @@ class ProfileScreen extends ConsumerWidget {
     }
 
     final diver = diverState.diver;
+    final allDives = diveLogState.diveLogs;
 
     // Calculate statistics
     final totalDives = allDives.length;

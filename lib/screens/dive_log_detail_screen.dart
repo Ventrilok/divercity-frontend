@@ -17,8 +17,8 @@ class DiveLogDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allDives = ref.watch(diveLogProvider);
-    final dive = allDives.firstWhere(
+    final diveLogState = ref.watch(diveLogProvider);
+    final dive = diveLogState.diveLogs.firstWhere(
       (d) => d.id == diveLogId,
       orElse: () => throw Exception('Dive not found'),
     );

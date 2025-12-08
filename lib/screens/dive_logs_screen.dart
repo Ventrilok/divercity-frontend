@@ -22,7 +22,8 @@ class _DiveLogsScreenState extends ConsumerState<DiveLogsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final allDives = ref.watch(diveLogProvider);
+    final diveLogState = ref.watch(diveLogProvider);
+    final allDives = diveLogState.diveLogs;
 
     // Filter and sort dives
     var filteredDives = allDives.where((dive) {

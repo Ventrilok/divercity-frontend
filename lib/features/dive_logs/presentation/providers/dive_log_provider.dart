@@ -1,132 +1,172 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/di/injection.dart';
 import '../../domain/entities/dive_log.dart';
-import '../../data/models/dive_log_model.dart';
-import '../../../../data/mock/mock_dive_logs.dart';
 import '../../../diver_profile/presentation/providers/diver_provider.dart';
 
-const String _diveLogsKey = 'dive_logs';
+/// State for dive logs with loading and error handling
+class DiveLogState {
+  final List<DiveLog> diveLogs;
+  final bool isLoading;
+  final String? error;
 
-/// Notifier for managing dive logs (Riverpod 3.x) with persistence
-class DiveLogNotifier extends Notifier<List<DiveLog>> {
-  SharedPreferences? _prefs;
+  DiveLogState({
+    this.diveLogs = const [],
+    this.isLoading = false,
+    this.error,
+  });
 
+  DiveLogState copyWith({
+    List<DiveLog>? diveLogs,
+    bool? isLoading,
+    String? error,
+  }) {
+    return DiveLogState(
+      diveLogs: diveLogs ?? this.diveLogs,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
+}
+
+/// Notifier for managing dive logs with API integration
+class DiveLogNotifier extends Notifier<DiveLogState> {
   @override
-  List<DiveLog> build() {
-    _loadDiveLogs();
-    return MockDiveLogs.getAllDiveLogs();
+  DiveLogState build() {
+    // Load dive logs on initialization
+    loadDiveLogs();
+    return DiveLogState(isLoading: true);
   }
 
-  /// Load dive logs from SharedPreferences
-  Future<void> _loadDiveLogs() async {
-    _prefs = await SharedPreferences.getInstance();
-    final String? jsonString = _prefs?.getString(_diveLogsKey);
+  /// Load dive logs from API (or cache if offline)
+  Future<void> loadDiveLogs() async {
+    state = state.copyWith(isLoading: true, error: null);
 
-    if (jsonString != null && jsonString.isNotEmpty) {
-      try {
-        final List<dynamic> jsonList = json.decode(jsonString);
-        final List<DiveLog> loadedLogs = jsonList
-            .map((json) => DiveLogModel.fromJson(json as Map<String, dynamic>).toEntity())
-            .toList();
-        state = loadedLogs;
-      } catch (e) {
-        // If there's an error loading, use mock data
-        state = MockDiveLogs.getAllDiveLogs();
-      }
-    }
-  }
+    final useCase = ref.read(getDiveLogsProvider);
+    final result = await useCase(kMockDiverId);
 
-  /// Save dive logs to SharedPreferences
-  Future<void> _saveDiveLogs() async {
-    _prefs ??= await SharedPreferences.getInstance();
-    final List<Map<String, dynamic>> jsonList =
-        state.map((log) => DiveLogModel.fromEntity(log).toJson()).toList();
-    final String jsonString = json.encode(jsonList);
-    await _prefs?.setString(_diveLogsKey, jsonString);
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          isLoading: false,
+          error: failure.message,
+        );
+      },
+      (diveLogs) {
+        state = state.copyWith(
+          diveLogs: diveLogs,
+          isLoading: false,
+          error: null,
+        );
+      },
+    );
   }
 
   /// Add a new dive log
-  void addDiveLog(DiveLog diveLog) {
-    state = [...state, diveLog];
-    _saveDiveLogs();
-    // Update diver's dive count
-    ref.read(diverProvider.notifier).incrementDiveCount();
+  Future<void> addDiveLog(DiveLog diveLog) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final useCase = ref.read(createDiveLogProvider);
+    final result = await useCase(diveLog);
+
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          isLoading: false,
+          error: failure.message,
+        );
+      },
+      (createdLog) {
+        state = state.copyWith(
+          diveLogs: [...state.diveLogs, createdLog],
+          isLoading: false,
+          error: null,
+        );
+        // Update diver's dive count
+        ref.read(diverProvider.notifier).incrementDiveCount();
+      },
+    );
   }
 
   /// Update an existing dive log
-  void updateDiveLog(DiveLog updatedLog) {
-    state = [
-      for (final log in state)
-        if (log.id == updatedLog.id) updatedLog else log
-    ];
-    _saveDiveLogs();
+  Future<void> updateDiveLog(DiveLog updatedLog) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final useCase = ref.read(updateDiveLogProvider);
+    final result = await useCase(updatedLog);
+
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          isLoading: false,
+          error: failure.message,
+        );
+      },
+      (updated) {
+        state = state.copyWith(
+          diveLogs: [
+            for (final log in state.diveLogs)
+              if (log.id == updated.id) updated else log
+          ],
+          isLoading: false,
+          error: null,
+        );
+      },
+    );
   }
 
   /// Delete a dive log by ID
-  void deleteDiveLog(String id) {
-    state = state.where((log) => log.id != id).toList();
-    _saveDiveLogs();
-    // Update diver's dive count
-    ref.read(diverProvider.notifier).decrementDiveCount();
+  Future<void> deleteDiveLog(String id) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final useCase = ref.read(deleteDiveLogProvider);
+    final result = await useCase(id);
+
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          isLoading: false,
+          error: failure.message,
+        );
+      },
+      (_) {
+        state = state.copyWith(
+          diveLogs: state.diveLogs.where((log) => log.id != id).toList(),
+          isLoading: false,
+          error: null,
+        );
+        // Update diver's dive count
+        ref.read(diverProvider.notifier).decrementDiveCount();
+      },
+    );
   }
 
   /// Toggle favorite status of a dive log
-  void toggleFavorite(String id) {
-    state = [
-      for (final log in state)
-        if (log.id == id) log.copyWith(isFavorite: !log.isFavorite) else log
-    ];
-    _saveDiveLogs();
+  Future<void> toggleFavorite(String id) async {
+    final log = state.diveLogs.firstWhere((log) => log.id == id);
+    final updatedLog = log.copyWith(isFavorite: !log.isFavorite);
+    await updateDiveLog(updatedLog);
   }
 
   /// Get a dive log by ID
   DiveLog? getDiveLogById(String id) {
     try {
-      return state.firstWhere((log) => log.id == id);
+      return state.diveLogs.firstWhere((log) => log.id == id);
     } catch (e) {
       return null;
     }
   }
-
-  /// Get recent dive logs
-  List<DiveLog> getRecentDiveLogs({int count = 3}) {
-    final sorted = List<DiveLog>.from(state);
-    sorted.sort((a, b) => b.diveDate.compareTo(a.diveDate));
-    return sorted.take(count).toList();
-  }
-
-  /// Get favorite dive logs
-  List<DiveLog> getFavoriteDiveLogs() {
-    return state.where((log) => log.isFavorite).toList();
-  }
-
-  /// Get most recent dive
-  DiveLog? getMostRecentDive() {
-    if (state.isEmpty) return null;
-    final sorted = List<DiveLog>.from(state);
-    sorted.sort((a, b) => b.diveDate.compareTo(a.diveDate));
-    return sorted.first;
-  }
-
-  /// Get dive logs sorted by date (newest first)
-  List<DiveLog> getSortedDiveLogs() {
-    final sorted = List<DiveLog>.from(state);
-    sorted.sort((a, b) => b.diveDate.compareTo(a.diveDate));
-    return sorted;
-  }
 }
 
 /// Provider for accessing dive logs
-final diveLogProvider = NotifierProvider<DiveLogNotifier, List<DiveLog>>(
+final diveLogProvider = NotifierProvider<DiveLogNotifier, DiveLogState>(
   DiveLogNotifier.new,
 );
 
 /// Provider for getting a specific dive log by ID
 final diveLogByIdProvider = Provider.family<DiveLog?, String>((ref, id) {
-  final logs = ref.watch(diveLogProvider);
+  final state = ref.watch(diveLogProvider);
   try {
-    return logs.firstWhere((log) => log.id == id);
+    return state.diveLogs.firstWhere((log) => log.id == id);
   } catch (e) {
     return null;
   }
@@ -134,22 +174,22 @@ final diveLogByIdProvider = Provider.family<DiveLog?, String>((ref, id) {
 
 /// Provider for getting recent dives
 final recentDivesProvider = Provider<List<DiveLog>>((ref) {
-  final logs = ref.watch(diveLogProvider);
-  final sorted = List<DiveLog>.from(logs);
+  final state = ref.watch(diveLogProvider);
+  final sorted = List<DiveLog>.from(state.diveLogs);
   sorted.sort((a, b) => b.diveDate.compareTo(a.diveDate));
   return sorted.take(3).toList();
 });
 
 /// Provider for getting sorted dive logs (newest first)
 final sortedDiveLogsProvider = Provider<List<DiveLog>>((ref) {
-  final logs = ref.watch(diveLogProvider);
-  final sorted = List<DiveLog>.from(logs);
+  final state = ref.watch(diveLogProvider);
+  final sorted = List<DiveLog>.from(state.diveLogs);
   sorted.sort((a, b) => b.diveDate.compareTo(a.diveDate));
   return sorted;
 });
 
 /// Provider for getting favorite dive logs
 final favoriteDiveLogsProvider = Provider<List<DiveLog>>((ref) {
-  final logs = ref.watch(diveLogProvider);
-  return logs.where((log) => log.isFavorite).toList();
+  final state = ref.watch(diveLogProvider);
+  return state.diveLogs.where((log) => log.isFavorite).toList();
 });

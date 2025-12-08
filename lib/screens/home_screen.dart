@@ -17,7 +17,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final diverState = ref.watch(diverProvider);
-    final allDives = ref.watch(diveLogProvider);
+    final diveLogState = ref.watch(diveLogProvider);
     final recentDives = ref.watch(recentDivesProvider);
     final emergencyContacts = ref.watch(emergencyContactsProvider);
 
@@ -29,6 +29,7 @@ class HomeScreen extends ConsumerWidget {
     }
 
     final diver = diverState.diver;
+    final allDives = diveLogState.diveLogs;
 
     return Scaffold(
       appBar: const OceanAppBar(

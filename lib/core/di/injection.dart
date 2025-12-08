@@ -12,6 +12,15 @@ import '../../features/diver_profile/data/repositories/diver_repository_impl.dar
 import '../../features/diver_profile/domain/repositories/diver_repository.dart';
 import '../../features/diver_profile/domain/usecases/get_diver_profile.dart';
 import '../../features/diver_profile/domain/usecases/update_diver_profile.dart';
+import '../../features/dive_logs/data/datasources/dive_log_local_datasource.dart';
+import '../../features/dive_logs/data/datasources/dive_log_remote_datasource.dart';
+import '../../features/dive_logs/data/repositories/dive_log_repository_impl.dart';
+import '../../features/dive_logs/domain/repositories/dive_log_repository.dart';
+import '../../features/dive_logs/domain/usecases/get_dive_logs.dart';
+import '../../features/dive_logs/domain/usecases/get_dive_log_by_id.dart';
+import '../../features/dive_logs/domain/usecases/create_dive_log.dart';
+import '../../features/dive_logs/domain/usecases/update_dive_log.dart';
+import '../../features/dive_logs/domain/usecases/delete_dive_log.dart';
 
 // ============================================================================
 // Core Providers
@@ -68,6 +77,54 @@ final getDiverProfileProvider = Provider((ref) {
 /// Update diver profile use case provider
 final updateDiverProfileProvider = Provider((ref) {
   return UpdateDiverProfile(ref.read(diverRepositoryProvider));
+});
+
+// ============================================================================
+// Feature: Dive Logs
+// ============================================================================
+
+/// Dive log remote datasource provider
+final diveLogRemoteDataSourceProvider = Provider<DiveLogRemoteDataSource>((ref) {
+  return DiveLogRemoteDataSourceImpl(ref.read(dioClientProvider).dio);
+});
+
+/// Dive log local datasource provider
+final diveLogLocalDataSourceProvider = Provider<DiveLogLocalDataSource>((ref) {
+  return DiveLogLocalDataSourceImpl();
+});
+
+/// Dive log repository provider
+final diveLogRepositoryProvider = Provider<DiveLogRepository>((ref) {
+  return DiveLogRepositoryImpl(
+    remoteDataSource: ref.read(diveLogRemoteDataSourceProvider),
+    localDataSource: ref.read(diveLogLocalDataSourceProvider),
+    networkInfo: ref.read(networkInfoProvider),
+  );
+});
+
+/// Get dive logs use case provider
+final getDiveLogsProvider = Provider((ref) {
+  return GetDiveLogs(ref.read(diveLogRepositoryProvider));
+});
+
+/// Get dive log by ID use case provider
+final getDiveLogByIdProvider = Provider((ref) {
+  return GetDiveLogById(ref.read(diveLogRepositoryProvider));
+});
+
+/// Create dive log use case provider
+final createDiveLogProvider = Provider((ref) {
+  return CreateDiveLog(ref.read(diveLogRepositoryProvider));
+});
+
+/// Update dive log use case provider
+final updateDiveLogProvider = Provider((ref) {
+  return UpdateDiveLog(ref.read(diveLogRepositoryProvider));
+});
+
+/// Delete dive log use case provider
+final deleteDiveLogProvider = Provider((ref) {
+  return DeleteDiveLog(ref.read(diveLogRepositoryProvider));
 });
 
 // ============================================================================
